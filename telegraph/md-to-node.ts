@@ -27,7 +27,7 @@ function isElementNode(node: Node): node is Element {
 
 function domToNode(domNode: Node) {
   if (isTextNode(domNode)) {
-    return domNode.data;
+    return domNode.data.trimStart();
   }
 
   if (!isElementNode(domNode)) {
@@ -37,6 +37,22 @@ function domToNode(domNode: Node) {
   const nodeElement: TelegraphNode = {
     tag: domNode.tagName.toLowerCase(),
   };
+
+  // Telegraph only has two types of headings
+  switch (nodeElement.tag) {
+    case 'h1':
+    case 'h2':
+      nodeElement.tag = 'h3';
+      break;
+    case 'h3':
+      nodeElement.tag = 'h4';
+      break;
+    case 'h4':
+    case 'h5':
+    case 'h6':
+      nodeElement.tag = 'p';
+      break;
+  }
 
   for (let i = 0; i < domNode.attributes.length; i++) {
     const attr = domNode.attributes[i];
