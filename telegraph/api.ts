@@ -6,35 +6,11 @@ import { micromark } from 'https://esm.sh/micromark';
 const BASE_URL = 'https://api.telegra.ph';
 const env = await load();
 
-const teststring = `
-## Deno
-
-[[Deno]]
-
-
-## Supabase
-
-I have to set up the Supabase tables and project.
-Details are not provided in the documentation.
-
-
-## Grammy
-
-### Sessions
-
-[Sessions and Storing Data (built-in) | grammY](https://grammy.dev/plugins/session.html)
-Sessions are necessary because Telegram bots don't manage sessions - i.e. doesn't have access to old messages.
-
-`;
-
 const token = env['TELEGRAPH_TOKEN'];
-async function createPage(markdownString: string) {
+export async function createPageFromHtml(html: string) {
   if (!token) throw new Error('TELEGRAPH_TOKEN is required');
 
-  const doc = new DOMParser().parseFromString(
-    micromark(markdownString.replace(/\n/g, '\r\n')),
-    'text/html'
-  )!;
+  const doc = new DOMParser().parseFromString(html, 'text/html')!;
   const content = bodyToNodes(doc.body)!;
   const url = new URL('createPage', BASE_URL);
 
@@ -56,4 +32,7 @@ async function createPage(markdownString: string) {
   console.log(data);
 }
 
-createPage(teststring);
+export function createPageFromMarkdown(markdownString: string) {
+  if (!token) throw new Error('TELEGRAPH_TOKEN is required');
+  return createPageFromHtml(micromark(markdownString));
+}
