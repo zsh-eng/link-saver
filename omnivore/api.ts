@@ -61,7 +61,7 @@ export class OmnivoreClient {
     }
   }
 
-  async getArticleHtmlById(id: string, url: string) {
+  async getArticleById(id: string, url: string) {
     try {
       const res = (await this.client.request({
         document: articleSavingRequestQuery,
@@ -79,7 +79,7 @@ export class OmnivoreClient {
         },
       })) as ArticleResult;
 
-      return articleRes?.article?.article?.content ?? '';
+      return articleRes?.article?.article;
     } catch (err) {
       console.error(err);
     }
@@ -95,7 +95,7 @@ export class OmnivoreClient {
       await new Promise((resolve) => setTimeout(resolve, 1000));
       const success = await this.isArticleSavingRequestSuccess(id, omnivoreUrl);
       if (success) {
-        return await this.getArticleHtmlById(id, url);
+        return await this.getArticleById(id, url);
       }
       retriesLeft--;
     }

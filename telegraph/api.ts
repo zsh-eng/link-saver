@@ -1,16 +1,19 @@
 import { load } from 'https://deno.land/std@0.221.0/dotenv/mod.ts';
-import { DOMParser } from 'https://deno.land/x/deno_dom/deno-dom-wasm.ts';
-import { micromark } from 'https://esm.sh/micromark@4.0.0';
+import { DOMParser } from 'https://deno.land/x/deno_dom@v0.1.45/deno-dom-wasm.ts';
 import { bodyToNodes } from '/telegraph/md-to-node.ts';
 
 const BASE_URL = 'https://api.telegra.ph';
 const env = await load();
 
 const token = env['TELEGRAPH_TOKEN'];
-export async function createPageFromHtml(html: string) {
+export async function createPageFromHtml(
+  title: string,
+  author: string,
+  bodyHtml: string
+) {
   if (!token) throw new Error('TELEGRAPH_TOKEN is required');
 
-  const doc = new DOMParser().parseFromString(html, 'text/html')!;
+  const doc = new DOMParser().parseFromString(bodyHtml, 'text/html')!;
   const content = bodyToNodes(doc.body)!;
   const url = new URL('createPage', BASE_URL);
 
@@ -21,7 +24,8 @@ export async function createPageFromHtml(html: string) {
     },
     body: JSON.stringify({
       access_token: token,
-      title: 'Hello World!',
+      title: title,
+      author_name: author,
       content,
     }),
   });
@@ -31,9 +35,4 @@ export async function createPageFromHtml(html: string) {
     throw new Error(data.error);
   }
   return data?.result?.url;
-}
-
-export function createPageFromMarkdown(markdownString: string) {
-  if (!token) throw new Error('TELEGRAPH_TOKEN is required');
-  return createPageFromHtml(micromark(markdownString));
 }
