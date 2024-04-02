@@ -1,3 +1,7 @@
+import {
+  FAILED_TO_SAVE_ARTICLE,
+  SUCCEEDED_TO_SAVE_ARTICLE,
+} from '/messages.ts';
 import { createPageFromHtml } from '/telegraph/api.ts';
 import { OmnivoreClient } from '/omnivore/api.ts';
 import { Bot } from 'https://deno.land/x/grammy@v1.21.2/mod.ts';
@@ -22,12 +26,19 @@ bot.on('message:entities:url', async (ctx) => {
     urlEntity.offset + urlEntity.length
   );
 
-  const html = await client.saveUrlAndGetArticleHtml(url);
-  if (!html) {
-    ctx.reply('Failed to save the URL.');
+  const article = await client.saveUrlAndGetArticleHtml(url);
+  if (!article?.content) {
+    console.log(FAILED_TO_SAVE_ARTICLE);
+    ctx.reply(FAILED_TO_SAVE_ARTICLE);
     return;
   }
-  const telegraphUrl = await createPageFromHtml(html);
+
+  const telegraphUrl = await createPageFromHtml(
+    article.title ?? 'Untitled',
+    article.author ?? 'Anonymous',
+    article.content ?? ''
+  );
+  console.log(SUCCEEDED_TO_SAVE_ARTICLE, telegraphUrl);
   ctx.reply(`You sent me a URL: ${telegraphUrl}`);
 });
 
@@ -37,4 +48,5 @@ bot.on('message:entities:url', async (ctx) => {
 // Now that you specified how to handle messages, you can start your bot.
 // This will connect to the Telegram servers and wait for messages.
 // Start the bot.
+console.log('Bot is up and running!');
 bot.start();
