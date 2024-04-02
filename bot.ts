@@ -8,9 +8,9 @@ import { Bot } from 'https://deno.land/x/grammy@v1.21.2/mod.ts';
 import { load } from 'https://deno.land/std@0.221.0/dotenv/mod.ts';
 
 const env = await load();
-const bot = new Bot(env['BOT_TOKEN']);
+const bot = new Bot(Deno.env.get('BOT_TOKEN')!);
 
-const client = new OmnivoreClient(env['OMNIVORE_TOKEN'] ?? '');
+const client = new OmnivoreClient(Deno.env.get('OMNIVORE_TOKEN')!);
 
 // You can now register listeners on your bot object `bot`.
 // grammY will call the listeners when users send messages to your bot.
