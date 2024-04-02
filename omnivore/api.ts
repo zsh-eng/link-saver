@@ -1,6 +1,6 @@
-import { load } from 'https://deno.land/std@0.221.0/dotenv/mod.ts';
 import { GraphQLClient } from 'https://deno.land/x/graphql_request@v4.1.0/mod.ts';
 import {
+  ArticleResult,
   ArticleSavingRequestResult,
   SaveUrlQueryResponse,
   articleQuery,
@@ -8,12 +8,8 @@ import {
   endpoint,
   saveUrlQuery,
 } from '/omnivore/graphql.ts';
-import { createPageFromHtml } from '/telegraph/api.ts';
 
-const env = await load();
-const token = env['OMNIVORE_TOKEN'];
-
-class OmnivoreClient {
+export class OmnivoreClient {
   private client: GraphQLClient;
 
   constructor(token: string) {
@@ -44,7 +40,10 @@ class OmnivoreClient {
     }
   }
 
-  async getById(id: string, url: string) {
+  async isArticleSavingRequestSuccess(
+    id: string,
+    url: string
+  ): Promise<boolean> {
     try {
       const res = (await this.client.request({
         document: articleSavingRequestQuery,
@@ -54,32 +53,51 @@ class OmnivoreClient {
         },
       })) as ArticleSavingRequestResult;
 
-      const article = await this.client.request({
+      const data = res.articleSavingRequest.articleSavingRequest;
+      return data.status === 'SUCCEEDED';
+    } catch (err) {
+      console.error(err);
+      return false;
+    }
+  }
+
+  async getArticleHtmlById(id: string, url: string) {
+    try {
+      const res = (await this.client.request({
+        document: articleSavingRequestQuery,
+        variables: {
+          id,
+          url,
+        },
+      })) as ArticleSavingRequestResult;
+
+      const articleRes = (await this.client.request({
         document: articleQuery,
         variables: {
           username: res.articleSavingRequest.articleSavingRequest.user.name,
           slug: res.articleSavingRequest.articleSavingRequest.slug,
         },
-      });
+      })) as ArticleResult;
 
-      return article;
+      return articleRes?.article?.article?.content ?? '';
     } catch (err) {
       console.error(err);
     }
   }
+
+  async saveUrlAndGetArticleHtml(url: string) {
+    const res = await this.saveUrl(url);
+    const omnivoreUrl = res.saveUrl.url;
+    const id = res.saveUrl.clientRequestId;
+
+    let retriesLeft = 5;
+    while (retriesLeft > 0) {
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+      const success = await this.isArticleSavingRequestSuccess(id, omnivoreUrl);
+      if (success) {
+        return await this.getArticleHtmlById(id, url);
+      }
+      retriesLeft--;
+    }
+  }
 }
-
-const client = new OmnivoreClient(token);
-
-// const res = await client.saveUrl(
-//   'https://www.nytimes.com/2024/03/10/opinion/biden-state-union-message.html'
-// );
-// console.log(res);
-
-const url =
-  'https://omnivore.app/clouded/links/107ddf40-3c73-4733-b4f5-8d967bb4d4d9';
-const id = '107ddf40-3c73-4733-b4f5-8d967bb4d4d9';
-
-const res = await client.getById(id, url);
-const html = res?.article?.article?.content;
-createPageFromHtml(html);

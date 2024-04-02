@@ -1,7 +1,7 @@
 import { load } from 'https://deno.land/std@0.221.0/dotenv/mod.ts';
 import { DOMParser } from 'https://deno.land/x/deno_dom/deno-dom-wasm.ts';
+import { micromark } from 'https://esm.sh/micromark@4.0.0';
 import { bodyToNodes } from '/telegraph/md-to-node.ts';
-import { micromark } from 'https://esm.sh/micromark';
 
 const BASE_URL = 'https://api.telegra.ph';
 const env = await load();
@@ -14,22 +14,23 @@ export async function createPageFromHtml(html: string) {
   const content = bodyToNodes(doc.body)!;
   const url = new URL('createPage', BASE_URL);
 
-  console.log(JSON.stringify(content));
-
-  const params = new URLSearchParams();
-  params.set('access_token', token);
-  params.set('title', 'Hello World!');
-  params.set('content', JSON.stringify(content));
-  url.search = params.toString();
-
   const res = await fetch(url.href, {
-    method: 'GET',
+    method: 'POST',
     headers: {
       'Content-Type': 'application/json',
     },
+    body: JSON.stringify({
+      access_token: token,
+      title: 'Hello World!',
+      content,
+    }),
   });
+
   const data = await res.json();
-  console.log(data);
+  if (!data.ok) {
+    throw new Error(data.error);
+  }
+  return data?.result?.url;
 }
 
 export function createPageFromMarkdown(markdownString: string) {

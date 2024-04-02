@@ -60,6 +60,7 @@ export const articleSavingRequestQuery = gql`
         articleSavingRequest {
           id
           slug
+          status
           user {
             id
             name
@@ -78,6 +79,13 @@ export type ArticleSavingRequestResult = {
     articleSavingRequest: {
       id: string;
       slug: string;
+      status:
+        | 'PROCESSING'
+        | 'SUCCEEDED'
+        | 'FAILED'
+        | 'DELETED'
+        | 'ARCHIVED'
+        | 'CONTENT_NOT_FETCHED';
       user: {
         id: string;
         name: string;
@@ -107,3 +115,17 @@ export const articleQuery = gql`
     }
   }
 `;
+
+export type ArticleResult = {
+  article: {
+    article: {
+      id: string;
+      title: string;
+      author: string;
+      description: string;
+      image: string;
+      url: string;
+      content: string;
+    };
+  };
+};
