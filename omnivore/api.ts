@@ -7,7 +7,7 @@ import {
   articleSavingRequestQuery,
   endpoint,
   saveUrlQuery,
-} from '/omnivore/graphql.ts';
+} from './graphql.ts';
 
 export class OmnivoreClient {
   private client: GraphQLClient;

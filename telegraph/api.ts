@@ -1,6 +1,6 @@
 import { load } from 'https://deno.land/std@0.221.0/dotenv/mod.ts';
 import { DOMParser } from 'https://deno.land/x/deno_dom@v0.1.45/deno-dom-wasm.ts';
-import { bodyToNodes } from '/telegraph/md-to-node.ts';
+import { bodyToNodes } from './md-to-node.ts';
 
 const BASE_URL = 'https://api.telegra.ph';
 const env = await load();

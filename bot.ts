@@ -1,9 +1,9 @@
 import {
   FAILED_TO_SAVE_ARTICLE,
   SUCCEEDED_TO_SAVE_ARTICLE,
-} from '/messages.ts';
-import { createPageFromHtml } from '/telegraph/api.ts';
-import { OmnivoreClient } from '/omnivore/api.ts';
+} from './messages.ts';
+import { createPageFromHtml } from './telegraph/api.ts';
+import { OmnivoreClient } from './omnivore/api.ts';
 import { Bot } from 'https://deno.land/x/grammy@v1.21.2/mod.ts';
 import { load } from 'https://deno.land/std@0.221.0/dotenv/mod.ts';
 

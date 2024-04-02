@@ -1,8 +1,5 @@
 {
   "tasks": {
     "bot": "deno run --allow-net --allow-env bot.ts"
-  },
-  "imports": {
-    "/": "./"
   }
 }
