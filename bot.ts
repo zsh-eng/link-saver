@@ -8,6 +8,12 @@ import { Bot } from 'https://deno.land/x/grammy@v1.21.2/mod.ts';
 import { load } from 'https://deno.land/std@0.221.0/dotenv/mod.ts';
 
 const env = await load();
+if (!Deno.env.has('BOT_TOKEN')) {
+  Deno.env.set('BOT_TOKEN', env.BOT_TOKEN);
+  Deno.env.set('OMNIVORE_TOKEN', env.OMNIVORE_TOKEN);
+  Deno.env.set('TELEGRAPH_TOKEN', env.TELEGRAPH_TOKEN);
+}
+
 const bot = new Bot(Deno.env.get('BOT_TOKEN')!);
 
 const client = new OmnivoreClient(Deno.env.get('OMNIVORE_TOKEN')!);
