@@ -1,5 +1,13 @@
 {
   "tasks": {
-    "bot": "deno run --allow-net --allow-env bot.ts"
+    "bot": "deno run --allow-net --allow-env mod.ts"
+  },
+  "deploy": {
+    "project": "1a16e387-68a9-40cc-bcb2-49eb7683139e",
+    "exclude": [
+      "**/node_modules"
+    ],
+    "include": [],
+    "entrypoint": "mod.ts"
   }
 }

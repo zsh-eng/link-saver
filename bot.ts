@@ -1,4 +1,3 @@
-import { load } from 'https://deno.land/std@0.221.0/dotenv/mod.ts';
 import { Bot } from 'https://deno.land/x/grammy@v1.21.2/mod.ts';
 import {
   FAILED_TO_SAVE_ARTICLE,
@@ -6,11 +5,25 @@ import {
 } from './messages.ts';
 import { getArticleFromHTML } from './reader.ts';
 import { createPageFromHtml } from './telegraph/api.ts';
-
+import { load } from 'https://deno.land/std@0.221.0/dotenv/mod.ts';
+// Handle .env
 const env = await load();
 if (!Deno.env.has('BOT_TOKEN')) {
+  if (!env.BOT_TOKEN || !env.TELEGRAPH_TOKEN) {
+    console.error('BOT_TOKEN and TELEGRAPH_TOKEN are required in .env file.');
+    Deno.exit(1);
+  }
+
   Deno.env.set('BOT_TOKEN', env.BOT_TOKEN);
   Deno.env.set('TELEGRAPH_TOKEN', env.TELEGRAPH_TOKEN);
+
+  if (env.ENVIRONMENT) {
+    console.log(
+      'Environment flag detected. Setting environment variable to',
+      env.ENVIRONMENT
+    );
+    Deno.env.set('ENVIRONMENT', env.ENVIRONMENT);
+  }
 }
 
 const bot = new Bot(Deno.env.get('BOT_TOKEN')!);
@@ -52,11 +65,4 @@ bot.on('message:entities:url', async (ctx) => {
   ctx.reply(`${telegraphUrl}`);
 });
 
-// Handle other messages.
-// bot.on('message', (ctx) => ctx.reply('Got another message!'));
-
-// Now that you specified how to handle messages, you can start your bot.
-// This will connect to the Telegram servers and wait for messages.
-// Start the bot.
-console.log('Bot is up and running!');
-bot.start();
+export default bot;
