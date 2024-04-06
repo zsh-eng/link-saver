@@ -27,6 +27,12 @@ bot.on('message:entities:url', async (ctx) => {
     urlEntity.offset,
     urlEntity.offset + urlEntity.length
   );
+  if (url.match(/https?:\/\/telegra\.ph\/.+/)) {
+    console.log('Telegraph URL');
+    ctx.reply('You sent me a Telegraph URL. Please send me an article URL.');
+    return;
+  }
+
   const html = await fetch(url).then((res) => res.text());
   const article = getArticleFromHTML(html);
 
@@ -43,7 +49,7 @@ bot.on('message:entities:url', async (ctx) => {
   );
 
   console.log(SUCCEEDED_TO_SAVE_ARTICLE, telegraphUrl);
-  ctx.reply(`You sent me a URL: ${telegraphUrl}`);
+  ctx.reply(`${telegraphUrl}`);
 });
 
 // Handle other messages.

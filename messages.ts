@@ -1,2 +1,3 @@
-export const FAILED_TO_SAVE_ARTICLE = 'Failed to save the URL.';
-export const SUCCEEDED_TO_SAVE_ARTICLE = 'Saved the URL.';
+export const FAILED_TO_SAVE_ARTICLE =
+  'Failed to convert article to Telegraph page.';
+export const SUCCEEDED_TO_SAVE_ARTICLE = 'Converted article to Telegraph page.';
